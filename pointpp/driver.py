@@ -106,8 +106,13 @@ def run(argv):
             I = np.where(all_months == month)[0]
             for j in e2t_loc:
                jt = e2t_loc[j]
-               tmp = method.calibrate(tobs[I, :, jt].flatten(), tfcst[I, :, jt].flatten(), efcst[I, :, j].flatten())
-               efcst2[I, :, j] = np.reshape(tmp, [len(I), LT])
+               if args.leadtime_dependent:
+                  for lt in range(LT):
+                     tmp = method.calibrate(tobs[I, lt, jt].flatten(), tfcst[I, lt, jt].flatten(), efcst[I, lt, j].flatten())
+                     efcst2[I, lt, j] = tmp
+               else:
+                  tmp = method.calibrate(tobs[I, :, jt].flatten(), tfcst[I, :, jt].flatten(), efcst[I, :, j].flatten())
+                  efcst2[I, :, j] = np.reshape(tmp, [len(I), LT])
       elif args.method == "anomaly":
          efcst2 = np.nan * np.zeros(eobs.shape)
          eobs2 = np.nan * np.zeros(eobs.shape)
